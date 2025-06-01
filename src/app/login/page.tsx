@@ -20,29 +20,40 @@ export default function LoginPage() {
     });
   }, []);
 
+
+  const formatPhone = (raw: string) => {
+  if (!raw.startsWith('+880')) {
+    if (raw.startsWith('880')) return `+${raw}`;
+    if (raw.startsWith('01')) return `+88${raw}`;
+  }
+  return raw;
+};
+
   const handleSendOtp = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: phone.startsWith('+880') ? phone : `+88${phone}`,
-    });
-    setLoading(false);
+  const formattedPhone = formatPhone(phone);
+  setLoading(true);
+  const { error } = await supabase.auth.signInWithOtp({
+    phone: formattedPhone,
+  });
+  setLoading(false);
 
-    if (error) alert(error.message);
-    else setStep('otp');
-  };
+  if (error) alert(error.message);
+  else setStep('otp');
+};
+const handleVerifyOtp = async () => {
+  const formattedPhone = formatPhone(phone);
+  setLoading(true);
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone: formattedPhone,
+    token: otp,
+    type: 'sms',
+  });
+  setLoading(false);
 
-  const handleVerifyOtp = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({
-      phone,
-      token: otp,
-      type: 'sms',
-    });
-    setLoading(false);
+  if (error) alert(error.message);
+  else router.replace('/');
+};
 
-    if (error) alert(error.message);
-    else router.replace('/');
-  };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-white px-4">
