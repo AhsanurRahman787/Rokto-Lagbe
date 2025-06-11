@@ -19,17 +19,15 @@ export default function LoginPage() {
       if (data.session) router.replace('/');
     });
   }, []);
-
-
-  const formatPhone = (raw: string) => {
-  if (!raw.startsWith('+880')) {
-    if (raw.startsWith('880')) return `+${raw}`;
-    if (raw.startsWith('01')) return `+88${raw}`;
-  }
-  return raw;
+  const formatPhone = (phone: string) => {
+  if (phone.startsWith('+880')) return phone;
+  if (phone.startsWith('880')) return `+${phone}`;
+  if (phone.startsWith('01')) return `+88${phone}`;
+  return phone;
 };
 
-  const handleSendOtp = async () => {
+
+const handleSendOtp = async () => {
   const formattedPhone = formatPhone(phone);
   setLoading(true);
   const { error } = await supabase.auth.signInWithOtp({
@@ -37,10 +35,15 @@ export default function LoginPage() {
   });
   setLoading(false);
 
-  if (error) alert(error.message);
-  else setStep('otp');
+  if (error) {
+    alert(error.message);
+  } else {
+    setStep('otp');
+  }
 };
-const handleVerifyOtp = async () => {
+
+
+  const handleVerifyOtp = async () => {
   const formattedPhone = formatPhone(phone);
   setLoading(true);
   const { data, error } = await supabase.auth.verifyOtp({
@@ -50,8 +53,11 @@ const handleVerifyOtp = async () => {
   });
   setLoading(false);
 
-  if (error) alert(error.message);
-  else router.replace('/');
+  if (error) {
+    alert(error.message);
+  } else {
+    router.replace('/');
+  }
 };
 
 
